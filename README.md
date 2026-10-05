@@ -22,6 +22,12 @@ This script fetches daily prayer times and sunrise information for the entire ye
 
 ## Usage
 
+Install the dependency:
+
+```bash
+pip install -r requirements.txt
+```
+
 Run the script with:
 
 ```bash
