@@ -1,8 +1,10 @@
 import argparse
 import csv
+import json
 import os
 import sys
 import time
+import unicodedata
 from datetime import date, timedelta
 
 import requests
@@ -11,10 +13,26 @@ import requests
 PRAYER_URL = "https://www.meteo.tn/horaire_gouvernorat/{date}/{gov}/{deleg}"
 SUNRISE_URL = "https://www.meteo.tn/lever_coucher_gouvernorat/{date}/{gov}/{deleg}"
 
-# Known zones: name -> (governorate id, delegation id) on meteo.tn
-ZONES = {
-    "sfax": (359, 632),
-}
+# Every governorate and delegation listed on https://www.meteo.tn/fr/heures-prieres
+ZONES_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "zones.json")
+with open(ZONES_FILE, encoding="utf-8") as f:
+    GOVERNORATES = json.load(f)["governorates"]
+
+
+def slug(text):
+    text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode()
+    return "-".join(text.lower().split())
+
+
+# Known zones: name -> (governorate id, delegation id) on meteo.tn.
+# A governorate name ("sousse") means its main city; "sousse/msaken" picks a delegation.
+ZONES = {}
+for gov in GOVERNORATES:
+    ZONES[slug(gov["name"])] = (gov["id"], gov["main_delegation"])
+    for deleg in gov["delegations"]:
+        if deleg["id"] == gov["main_delegation"]:
+            continue
+        ZONES[f"{slug(gov['name'])}/{slug(deleg['name'])}"] = (gov["id"], deleg["id"])
 
 COLUMNS = ["DATE", "FAJR", "SUNRISE", "DHUHR", "ASR", "MAGHRIB", "ISHA"]
 
@@ -25,8 +43,12 @@ def parse_args():
     )
     parser.add_argument("--year", type=int, default=date.today().year,
                         help="year to scrape (default: current year)")
-    parser.add_argument("--zone", default="sfax", choices=sorted(ZONES),
-                        help="known zone to scrape (default: sfax)")
+    parser.add_argument("--zone", default="sfax",
+                        help="governorate (e.g. sousse) or governorate/delegation "
+                             "(e.g. sousse/msaken) to scrape (default: sfax); "
+                             "see --list-zones")
+    parser.add_argument("--list-zones", action="store_true",
+                        help="print every zone name and exit")
     parser.add_argument("--governorate", type=int,
                         help="meteo.tn governorate id (overrides --zone)")
     parser.add_argument("--delegation", type=int,
@@ -39,15 +61,26 @@ def parse_args():
                         help="ask for the zone and year instead of using options")
     args = parser.parse_args()
 
+    if args.list_zones:
+        for name in ZONES:
+            print(name)
+        sys.exit(0)
     if args.interactive:
-        ask_interactive(args)
+        try:
+            ask_interactive(args)
+        except (EOFError, KeyboardInterrupt):
+            print("\nCancelled.")
+            sys.exit(1)
         return args
 
     if (args.governorate is None) != (args.delegation is None):
         parser.error("--governorate and --delegation must be given together")
     if args.governorate is None:
-        args.governorate, args.delegation = ZONES[args.zone]
-        args.name = args.name or args.zone
+        zone = args.zone.lower()
+        if zone not in ZONES:
+            parser.error(f"unknown zone '{args.zone}'; see --list-zones")
+        args.governorate, args.delegation = ZONES[zone]
+        args.name = args.name or zone.replace("/", "_")
     else:
         args.name = args.name or f"{args.governorate}_{args.delegation}"
     return args
@@ -67,27 +100,36 @@ def ask_int(prompt, default=None):
         print("Please enter a number.")
 
 
-def ask_interactive(args):
-    names = sorted(ZONES)
-    print("Zones:")
-    for i, name in enumerate(names, 1):
-        print(f"  {i:2}. {name}")
-    print(f"  {len(names) + 1:2}. other (enter meteo.tn ids)")
-
-    default = names.index("sfax") + 1 if "sfax" in names else 1
+def ask_choice(prompt, options, default):
+    for i, option in enumerate(options, 1):
+        print(f"  {i:2}. {option}")
     while True:
-        choice = ask_int("Choose a zone", default)
-        if 1 <= choice <= len(names) + 1:
-            break
-        print(f"Please choose between 1 and {len(names) + 1}.")
+        choice = ask_int(prompt, default)
+        if 1 <= choice <= len(options):
+            return choice - 1
+        print(f"Please choose between 1 and {len(options)}.")
 
-    if choice <= len(names):
-        args.name = names[choice - 1]
-        args.governorate, args.delegation = ZONES[args.name]
-    else:
+
+def ask_interactive(args):
+    gov_names = [gov["name"] for gov in GOVERNORATES] + ["Other (enter meteo.tn ids)"]
+    print("Governorates:")
+    default = next(i for i, gov in enumerate(GOVERNORATES, 1) if gov["id"] == 359)
+    g = ask_choice("Choose a governorate", gov_names, default)
+
+    if g == len(GOVERNORATES):
         args.governorate = ask_int("Governorate id")
         args.delegation = ask_int("Delegation id")
         args.name = ask("Name for the file", f"{args.governorate}_{args.delegation}")
+    else:
+        gov = GOVERNORATES[g]
+        delegs = gov["delegations"]
+        print(f"Delegations of {gov['name']}:")
+        default = next(i for i, d in enumerate(delegs, 1) if d["id"] == gov["main_delegation"])
+        d = delegs[ask_choice("Choose a delegation", [d["name"] for d in delegs], default)]
+        args.governorate, args.delegation = gov["id"], d["id"]
+        args.name = slug(gov["name"])
+        if d["id"] != gov["main_delegation"]:
+            args.name += "_" + slug(d["name"])
 
     args.year = ask_int("Year", date.today().year)
 
