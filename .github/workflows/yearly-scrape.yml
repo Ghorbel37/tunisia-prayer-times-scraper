@@ -1,0 +1,54 @@
+name: Yearly prayer times
+
+on:
+  schedule:
+    # Every year on 1 January at 03:00 UTC
+    - cron: "0 3 1 1 *"
+  workflow_dispatch:
+    inputs:
+      year:
+        description: "Year to scrape (empty = current year)"
+        required: false
+      zone:
+        description: "Zone to scrape, e.g. sousse or sousse/msaken"
+        required: false
+        default: "sfax"
+
+permissions:
+  contents: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Pick the year and zone
+        env:
+          YEAR: ${{ inputs.year }}
+          ZONE: ${{ inputs.zone }}
+        run: |
+          echo "YEAR=${YEAR:-$(date -u +%Y)}" >> "$GITHUB_ENV"
+          echo "ZONE=${ZONE:-sfax}" >> "$GITHUB_ENV"
+
+      - name: Scrape the year
+        run: python scrape_prayer.py --zone "$ZONE" --year "$YEAR"
+
+      - name: Commit the CSV
+        run: |
+          git config user.name "Ghorbel37"
+          git config user.email "44169654+Ghorbel37@users.noreply.github.com"
+          git add data/
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Add prayer times for $ZONE $YEAR"
+            git push
+          fi
