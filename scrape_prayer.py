@@ -41,12 +41,12 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description="Scrape a full year of prayer times from meteo.tn into a CSV file."
     )
-    parser.add_argument("--year", type=int, default=date.today().year,
-                        help="year to scrape (default: current year)")
-    parser.add_argument("--zone", default="sfax",
+    parser.add_argument("--year", type=int,
+                        help="year to scrape (default: current year, or asked in the menus)")
+    parser.add_argument("--zone",
                         help="governorate (e.g. sousse) or governorate/delegation "
-                             "(e.g. sousse/msaken) to scrape (default: sfax); "
-                             "see --list-zones")
+                             "(e.g. sousse/msaken) to scrape; see --list-zones. "
+                             "Without a zone, the script asks for one in menus")
     parser.add_argument("--list-zones", action="store_true",
                         help="print every zone name and exit")
     parser.add_argument("--governorate", type=int,
@@ -57,15 +57,15 @@ def parse_args():
                         help="zone name used in the output file name (default: the zone name)")
     parser.add_argument("--output-dir", default="data",
                         help="folder the CSV is written to (default: data)")
-    parser.add_argument("-i", "--interactive", action="store_true",
-                        help="ask for the zone and year instead of using options")
     args = parser.parse_args()
 
     if args.list_zones:
         for name in ZONES:
             print(name)
         sys.exit(0)
-    if args.interactive:
+    if args.zone is None and args.governorate is None and args.delegation is None:
+        if not sys.stdin.isatty():
+            parser.error("no zone given; pass --zone or --governorate/--delegation")
         try:
             ask_interactive(args)
         except (EOFError, KeyboardInterrupt):
@@ -83,6 +83,8 @@ def parse_args():
         args.name = args.name or zone.replace("/", "_")
     else:
         args.name = args.name or f"{args.governorate}_{args.delegation}"
+    if args.year is None:
+        args.year = date.today().year
     return args
 
 
@@ -100,7 +102,7 @@ def ask_int(prompt, default=None):
         print("Please enter a number.")
 
 
-def ask_choice(prompt, options, default):
+def ask_choice(prompt, options, default=None):
     for i, option in enumerate(options, 1):
         print(f"  {i:2}. {option}")
     while True:
@@ -113,8 +115,7 @@ def ask_choice(prompt, options, default):
 def ask_interactive(args):
     gov_names = [gov["name"] for gov in GOVERNORATES] + ["Other (enter meteo.tn ids)"]
     print("Governorates:")
-    default = next(i for i, gov in enumerate(GOVERNORATES, 1) if gov["id"] == 359)
-    g = ask_choice("Choose a governorate", gov_names, default)
+    g = ask_choice("Choose a governorate", gov_names)
 
     if g == len(GOVERNORATES):
         args.governorate = ask_int("Governorate id")
@@ -124,14 +125,16 @@ def ask_interactive(args):
         gov = GOVERNORATES[g]
         delegs = gov["delegations"]
         print(f"Delegations of {gov['name']}:")
-        default = next(i for i, d in enumerate(delegs, 1) if d["id"] == gov["main_delegation"])
-        d = delegs[ask_choice("Choose a delegation", [d["name"] for d in delegs], default)]
+        labels = [d["name"] + (" (main city)" if d["id"] == gov["main_delegation"] else "")
+                  for d in delegs]
+        d = delegs[ask_choice("Choose a delegation", labels)]
         args.governorate, args.delegation = gov["id"], d["id"]
         args.name = slug(gov["name"])
         if d["id"] != gov["main_delegation"]:
             args.name += "_" + slug(d["name"])
 
-    args.year = ask_int("Year", date.today().year)
+    if args.year is None:
+        args.year = ask_int("Year", date.today().year)
 
 
 def fetch_day(day, gov, deleg):

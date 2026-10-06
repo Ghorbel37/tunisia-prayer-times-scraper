@@ -46,19 +46,18 @@ Run the script with:
 python scrape_prayer.py
 ```
 
-By default it scrapes Sfax for the current year. To be asked for the governorate, delegation and year instead, run:
+It asks you to pick a governorate, then a delegation, then the year (press Enter for the current year). To skip the questions, give the zone on the command line:
 
 ```bash
-python scrape_prayer.py -i
+python scrape_prayer.py --zone sousse --year 2027
 ```
 
 Options:
 
 | Option | Meaning |
 |--------|---------|
-| `-i`, `--interactive` | Ask for the zone and year |
 | `--year 2027` | Year to scrape (default: current year) |
-| `--zone sousse` | Governorate to scrape, using its main city (default: `sfax`) |
+| `--zone sousse` | Governorate to scrape, using its main city |
 | `--zone sousse/msaken` | A specific delegation of a governorate |
 | `--list-zones` | Print every zone name |
 | `--governorate 359 --delegation 632` | Any meteo.tn zone by its ids (overrides `--zone`) |
