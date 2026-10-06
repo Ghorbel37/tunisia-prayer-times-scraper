@@ -1,5 +1,7 @@
 <p align="center">
-  <img src="assets/icon.svg" alt="Crescent and clock icon" width="96">
+  <a href="https://play.google.com/store/apps/details?id=com.reworewo.prayertimes">
+    <img src="https://play-lh.googleusercontent.com/imB-yjAp8qNYa2-Efuk5zR2S7FEvc5vanzOzoXynWLR91DZ-piSjUzWW4nu13Cl3KVNrB-tnYmnGsMHbEndjmJw=w240-h480" alt="Prayer Times app logo" width="96">
+  </a>
 </p>
 
 # Prayer Times Scraper for Tunisia
