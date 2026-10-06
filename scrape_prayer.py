@@ -35,7 +35,13 @@ def parse_args():
                         help="zone name used in the output file name (default: the zone name)")
     parser.add_argument("--output-dir", default="data",
                         help="folder the CSV is written to (default: data)")
+    parser.add_argument("-i", "--interactive", action="store_true",
+                        help="ask for the zone and year instead of using options")
     args = parser.parse_args()
+
+    if args.interactive:
+        ask_interactive(args)
+        return args
 
     if (args.governorate is None) != (args.delegation is None):
         parser.error("--governorate and --delegation must be given together")
@@ -45,6 +51,45 @@ def parse_args():
     else:
         args.name = args.name or f"{args.governorate}_{args.delegation}"
     return args
+
+
+def ask(prompt, default=None):
+    suffix = f" [{default}]" if default is not None else ""
+    answer = input(f"{prompt}{suffix}: ").strip()
+    return answer or (str(default) if default is not None else "")
+
+
+def ask_int(prompt, default=None):
+    while True:
+        answer = ask(prompt, default)
+        if answer.isdigit():
+            return int(answer)
+        print("Please enter a number.")
+
+
+def ask_interactive(args):
+    names = sorted(ZONES)
+    print("Zones:")
+    for i, name in enumerate(names, 1):
+        print(f"  {i:2}. {name}")
+    print(f"  {len(names) + 1:2}. other (enter meteo.tn ids)")
+
+    default = names.index("sfax") + 1 if "sfax" in names else 1
+    while True:
+        choice = ask_int("Choose a zone", default)
+        if 1 <= choice <= len(names) + 1:
+            break
+        print(f"Please choose between 1 and {len(names) + 1}.")
+
+    if choice <= len(names):
+        args.name = names[choice - 1]
+        args.governorate, args.delegation = ZONES[args.name]
+    else:
+        args.governorate = ask_int("Governorate id")
+        args.delegation = ask_int("Delegation id")
+        args.name = ask("Name for the file", f"{args.governorate}_{args.delegation}")
+
+    args.year = ask_int("Year", date.today().year)
 
 
 def fetch_day(day, gov, deleg):
@@ -96,6 +141,10 @@ def scrape_full_timetable(year, gov, deleg, name, output_dir):
             missing.append(date_str)
             rows.append({"DATE": date_str})
             print(f"Failed to fetch {date_str}: {e}")
+
+        if current_date == start_date and missing:
+            print(f"No data for {date_str}; check the zone ids. Nothing written.")
+            return False
 
         # Sleep briefly to be respectful to the server
         time.sleep(0.2)
