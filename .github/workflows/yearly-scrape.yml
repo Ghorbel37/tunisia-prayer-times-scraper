@@ -10,7 +10,7 @@ on:
         description: "Year to scrape (empty = current year)"
         required: false
       zone:
-        description: "Zone to scrape"
+        description: "Zone to scrape, e.g. sousse or sousse/msaken"
         required: false
         default: "sfax"
 
