@@ -10,7 +10,7 @@ on:
         description: "Year to scrape (empty = current year)"
         required: false
       zone:
-        description: "Zone to scrape"
+        description: "Zone to scrape, e.g. tunis or tunis/carthage"
         required: false
         default: "tunis"
 

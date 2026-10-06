@@ -18,7 +18,7 @@ This script fetches daily prayer times and sunrise information for a full year f
 
 - **Official Source**: Data directly from Tunisia's official weather/meteorological authority
 - **Complete Year Coverage**: Scrapes every day of the chosen year
-- **Choose the Zone**: Pick a known city or any meteo.tn governorate and delegation
+- **Choose the Zone**: All 24 governorates and their delegations, by name or from a menu
 - **Yearly Dataset**: A GitHub Action saves each new year's CSV in `data/`
 - **Comprehensive Prayer Data**: Captures all five daily prayers:
   - Fajr (pre-dawn)
@@ -44,12 +44,21 @@ Run the script with:
 python scrape_prayer.py --zone tunis
 ```
 
-It scrapes the current year unless you give `--year`. Options:
+To be asked for the governorate, delegation and year instead, run:
+
+```bash
+python scrape_prayer.py -i
+```
+
+Options:
 
 | Option | Meaning |
 |--------|---------|
+| `-i`, `--interactive` | Ask for the zone and year |
 | `--year 2027` | Year to scrape (default: current year) |
-| `--zone tunis` | Known zone to scrape |
+| `--zone tunis` | Governorate to scrape, using its main city |
+| `--zone tunis/carthage` | A specific delegation of a governorate |
+| `--list-zones` | Print every zone name |
 | `--governorate 342 --delegation 615` | Any meteo.tn zone by its ids (overrides `--zone`) |
 | `--name tunis` | Zone name used in the file name |
 | `--output-dir data` | Folder the CSV is written to (default: `data`) |
@@ -68,16 +77,16 @@ The [Yearly prayer times](.github/workflows/yearly-scrape.yml) workflow runs eve
 
 ## Output
 
-The script generates a CSV file with the following columns:
+The script generates a CSV file with the following columns (real values for Tunis):
 
 | DATE       | FAJR  | SUNRISE | DHUHR | ASR   | MAGHRIB | ISHA  |
 |------------|-------|---------|-------|-------|---------|-------|
-| 2026-01-01 | 06:45 | 07:42   | 12:35 | 15:28 | 17:38   | 19:05 |
-| 2026-01-02 | 06:46 | 07:43   | 12:35 | 15:29 | 17:39   | 19:06 |
+| 2026-01-01 | 05:59 | 07:31   | 12:30 | 14:55 | 17:16   | 18:47 |
+| 2026-01-02 | 05:59 | 07:32   | 12:30 | 14:56 | 17:17   | 18:48 |
 | ...        | ...   | ...     | ...   | ...   | ...     | ...   |
 
 Each row represents one day with times in HH:MM format.
 
-## Adding a zone
+## Zones
 
-meteo.tn identifies a place by a governorate id and a delegation id (Tunis is `342/615`). To find another one, open the prayer times on meteo.tn with your browser's developer tools and look for a request to `horaire_gouvernorat/<date>/<governorate>/<delegation>`. Then either pass the ids with `--governorate` and `--delegation`, or add the zone to `ZONES` in `scrape_prayer.py` so it can be used with `--zone`.
+`zones.json` lists all 24 governorates and their delegations with their meteo.tn ids, taken from the [meteo.tn prayer times page](https://www.meteo.tn/fr/heures-prieres). The main city of each governorate was checked against the API. If meteo.tn adds a place, you can still scrape it with `--governorate` and `--delegation`, or add it to `zones.json`.
