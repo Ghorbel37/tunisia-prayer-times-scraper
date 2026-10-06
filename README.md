@@ -43,20 +43,19 @@ pip install -r requirements.txt
 Run the script with:
 
 ```bash
-python scrape_prayer.py --zone tunis
+python scrape_prayer.py
 ```
 
-To be asked for the governorate, delegation and year instead, run:
+It asks you to pick a governorate, then a delegation, then the year (press Enter for the current year). To skip the questions, give the zone on the command line:
 
 ```bash
-python scrape_prayer.py -i
+python scrape_prayer.py --zone tunis --year 2027
 ```
 
 Options:
 
 | Option | Meaning |
 |--------|---------|
-| `-i`, `--interactive` | Ask for the zone and year |
 | `--year 2027` | Year to scrape (default: current year) |
 | `--zone tunis` | Governorate to scrape, using its main city |
 | `--zone tunis/carthage` | A specific delegation of a governorate |
