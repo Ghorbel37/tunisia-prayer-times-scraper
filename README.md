@@ -34,22 +34,40 @@ This script fetches daily prayer times and sunrise information for a full year f
 
 ## Usage
 
-Install the dependency:
+Create a virtual environment and install the dependency, once.
 
-```bash
-pip install -r requirements.txt
+Windows (PowerShell):
+
+```powershell
+python -m venv .venv
+.venv\Scripts\python -m pip install -r requirements.txt
 ```
 
-Run the script with:
+Linux and macOS:
 
 ```bash
-python scrape_prayer.py
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+```
+
+Run the script with the virtual environment's Python:
+
+```powershell
+.venv\Scripts\python scrape_prayer.py
+```
+
+```bash
+.venv/bin/python scrape_prayer.py
 ```
 
 It asks you to pick a governorate, then a delegation, then the year (press Enter for the current year). To skip the questions, give the zone on the command line:
 
+```powershell
+.venv\Scripts\python scrape_prayer.py --zone tunis --year 2027
+```
+
 ```bash
-python scrape_prayer.py --zone tunis --year 2027
+.venv/bin/python scrape_prayer.py --zone tunis --year 2027
 ```
 
 Options:
