@@ -235,6 +235,21 @@ def scrape_full_timetable(year, gov, deleg, name, output_dir, delay=0.2):
         time.sleep(random.uniform(delay * 0.5, delay * 1.5))
         current_date += timedelta(days=1)
 
+    if missing and os.path.exists(filename):
+        # Keep what an earlier run already saved for the days that failed this time,
+        # so a bad run never replaces a complete file with gaps
+        with open(filename, newline='', encoding='utf-8') as csvfile:
+            saved = {row["DATE"]: row for row in csv.DictReader(csvfile)}
+        kept = 0
+        for i, row in enumerate(rows):
+            old = saved.get(row["DATE"], {})
+            if row["DATE"] in missing and all(old.get(col) for col in COLUMNS):
+                rows[i] = {col: old[col] for col in COLUMNS}
+                missing.remove(row["DATE"])
+                kept += 1
+        if kept:
+            print(f"Kept {kept} day(s) from the existing file")
+
     if len(missing) == len(rows):
         print(f"No data found for {name} {year}; nothing written.")
         return False

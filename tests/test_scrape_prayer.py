@@ -185,6 +185,30 @@ class ScrapeTest(unittest.TestCase):
         march_first = next(r for r in rows if r["DATE"] == "2026-03-01")
         self.assertEqual(march_first["FAJR"], "")
 
+    def test_failed_days_keep_the_existing_file(self):
+        self.assertTrue(self.scrape(full_day))
+
+        def fetch(day, gov, deleg):
+            if day.month == 3:
+                raise ConnectionError("dropped")
+            return full_day(day, gov, deleg) | {"FAJR": "06:00"}
+
+        self.assertTrue(self.scrape(fetch))
+        rows = {r["DATE"]: r for r in self.read_csv()}
+        self.assertEqual(len(rows), 365)
+        self.assertEqual(rows["2026-03-15"]["FAJR"], "05:00")  # kept from the first run
+        self.assertEqual(rows["2026-04-15"]["FAJR"], "06:00")  # updated by the second run
+
+    def test_failed_days_stay_empty_without_an_existing_file(self):
+        def fetch(day, gov, deleg):
+            if day.month == 3:
+                raise ConnectionError("dropped")
+            return full_day(day, gov, deleg)
+
+        self.assertFalse(self.scrape(fetch))
+        rows = {r["DATE"]: r for r in self.read_csv()}
+        self.assertEqual(rows["2026-03-15"]["FAJR"], "")
+
     def test_failed_first_day_writes_nothing(self):
         def fetch(day, gov, deleg):
             raise ConnectionError("wrong ids")
