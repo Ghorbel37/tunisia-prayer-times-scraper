@@ -195,7 +195,7 @@ def scrape_full_timetable(year, gov, deleg, name, output_dir, delay=0.2):
     # One folder per zone, so every year of a zone sits together
     zone_dir = os.path.join(output_dir, name)
     os.makedirs(zone_dir, exist_ok=True)
-    filename = os.path.join(zone_dir, f"prayer_times_{name}_{year}.csv")
+    filename = os.path.join(zone_dir, f"prayer_times_tunisia_{name}_{year}.csv")
 
     print(f"Starting scrape for {name} {year} ({gov}/{deleg})... output file: {filename}")
 
