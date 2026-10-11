@@ -1,6 +1,7 @@
 import argparse
 import csv
 import json
+import logging
 import os
 import random
 import sys
@@ -9,13 +10,17 @@ import unicodedata
 from datetime import date, timedelta
 
 import requests
+from requests.adapters import HTTPAdapter, Retry
 
 # Base URLs for the two different endpoints
 PRAYER_URL = "https://www.meteo.tn/horaire_gouvernorat/{date}/{gov}/{deleg}"
 SUNRISE_URL = "https://www.meteo.tn/lever_coucher_gouvernorat/{date}/{gov}/{deleg}"
 
-# One connection reused for every request, instead of a new one each time
+# One connection reused for every request, instead of a new one each time.
+# A failed request is tried again up to 5 times, waiting 0, 10, 20, 40 then 80 seconds.
 SESSION = requests.Session()
+SESSION.mount("https://", HTTPAdapter(max_retries=Retry(
+    total=5, backoff_factor=5, status_forcelist=[429, 500, 502, 503, 504])))
 
 # Every governorate and delegation listed on https://www.meteo.tn/fr/heures-prieres
 ZONES_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "zones.json")
@@ -158,14 +163,18 @@ def ask_interactive(args):
         args.year = ask_int("Year", date.today().year)
 
 
+def get_data(url):
+    resp = SESSION.get(url, timeout=10)
+    resp.raise_for_status()
+    return resp.json().get("data") or {}
+
+
 def fetch_day(day, gov, deleg):
     date_str = day.strftime("%Y-%m-%d")
     row = {"DATE": date_str}
 
     # Get Prayer Times
-    p_resp = SESSION.get(PRAYER_URL.format(date=date_str, gov=gov, deleg=deleg), timeout=10)
-    p_resp.raise_for_status()
-    p_data = p_resp.json().get("data") or {}
+    p_data = get_data(PRAYER_URL.format(date=date_str, gov=gov, deleg=deleg))
     row["FAJR"] = p_data.get("sobh", "")
     row["DHUHR"] = p_data.get("dhohr", "")
     row["ASR"] = p_data.get("aser", "")
@@ -173,9 +182,7 @@ def fetch_day(day, gov, deleg):
     row["ISHA"] = p_data.get("isha", "")
 
     # Get Sunrise
-    s_resp = SESSION.get(SUNRISE_URL.format(date=date_str, gov=gov, deleg=deleg), timeout=10)
-    s_resp.raise_for_status()
-    s_data = s_resp.json().get("data") or {}
+    s_data = get_data(SUNRISE_URL.format(date=date_str, gov=gov, deleg=deleg))
     row["SUNRISE"] = s_data.get("lever", "")
 
     return row
@@ -235,6 +242,8 @@ def scrape_full_timetable(year, gov, deleg, name, output_dir, delay=0.2):
 
 
 if __name__ == "__main__":
+    # Show the "Retrying ..." lines that requests logs when a request fails
+    logging.basicConfig(format="  %(message)s")
     args = parse_args()
     failed = [name for gov, deleg, name in args.targets
               if not scrape_full_timetable(args.year, gov, deleg, name, args.output_dir,
