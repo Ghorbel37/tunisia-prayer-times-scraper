@@ -10,7 +10,7 @@ on:
         description: "Year to scrape (empty = current year)"
         required: false
       zone:
-        description: "Zone to scrape, e.g. tunis or tunis/carthage"
+        description: "Zones to scrape, separated by spaces or commas, e.g. tunis or tunis/carthage, sousse"
         required: false
         default: "tunis"
 
@@ -30,7 +30,7 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Pick the year and zone
+      - name: Pick the year and zones
         env:
           YEAR: ${{ inputs.year }}
           ZONE: ${{ inputs.zone }}
@@ -41,7 +41,8 @@ jobs:
       - name: Scrape the year
         run: python scrape_prayer.py --zone "$ZONE" --year "$YEAR"
 
-      - name: Commit the CSV
+      - name: Commit the CSVs
+        if: ${{ !cancelled() }}
         run: |
           git config user.name "Ghorbel37"
           git config user.email "44169654+Ghorbel37@users.noreply.github.com"
@@ -49,6 +50,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else
-            git commit -m "Add prayer times for $ZONE $YEAR"
+            git commit -m "Add prayer times for $(echo "$ZONE" | tr ',' ' ' | xargs | sed 's/ /, /g') $YEAR"
             git push
           fi

@@ -70,6 +70,16 @@ It asks you to pick a governorate, then a delegation, then the year (press Enter
 .venv/bin/python scrape_prayer.py --zone tunis --year 2027
 ```
 
+To scrape several zones in one run, list them after `--zone`. Each zone gets its own CSV:
+
+```powershell
+.venv\Scripts\python scrape_prayer.py --zone tunis tunis/carthage ariana
+```
+
+```bash
+.venv/bin/python scrape_prayer.py --zone tunis tunis/carthage ariana
+```
+
 Options:
 
 | Option | Meaning |
@@ -77,9 +87,10 @@ Options:
 | `--year 2027` | Year to scrape (default: current year) |
 | `--zone tunis` | Governorate to scrape, using its main city |
 | `--zone tunis/carthage` | A specific delegation of a governorate |
+| `--zone tunis ariana` | Several zones, separated by spaces or commas |
 | `--list-zones` | Print every zone name |
 | `--governorate 342 --delegation 615` | Any meteo.tn zone by its ids (overrides `--zone`) |
-| `--name tunis` | Zone name used in the file name |
+| `--name tunis` | Zone name used in the file name (one zone only) |
 | `--output-dir data` | Folder the CSV is written to (default: `data`) |
 
 The script will:
@@ -92,7 +103,7 @@ It exits with an error if any day could not be fetched completely, so a broken y
 
 ## Yearly dataset
 
-The [Yearly prayer times](.github/workflows/yearly-scrape.yml) workflow runs every year on 1 January, scrapes that year for Tunis and commits the CSV to `data/`, so the repository builds up a dataset over the years. It can also be started by hand from the Actions tab, with a year and zone of your choice.
+The [Yearly prayer times](.github/workflows/yearly-scrape.yml) workflow runs every year on 1 January, scrapes that year for Tunis and commits the CSV to `data/`, so the repository builds up a dataset over the years. It can also be started by hand from the Actions tab, with a year and one or more zones of your choice (for example `tunis, ariana`).
 
 ## Output
 

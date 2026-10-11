@@ -43,9 +43,11 @@ def parse_args():
     )
     parser.add_argument("--year", type=int,
                         help="year to scrape (default: current year, or asked in the menus)")
-    parser.add_argument("--zone",
+    parser.add_argument("--zone", nargs="+", action="extend",
                         help="governorate (e.g. tunis) or governorate/delegation "
                              "(e.g. tunis/carthage) to scrape; see --list-zones. "
+                             "Give several zones, separated by spaces or commas, "
+                             "to scrape each of them. "
                              "Without a zone, the script asks for one in menus")
     parser.add_argument("--list-zones", action="store_true",
                         help="print every zone name and exit")
@@ -76,13 +78,19 @@ def parse_args():
     if (args.governorate is None) != (args.delegation is None):
         parser.error("--governorate and --delegation must be given together")
     if args.governorate is None:
-        zone = args.zone.lower()
-        if zone not in ZONES:
-            parser.error(f"unknown zone '{args.zone}'; see --list-zones")
-        args.governorate, args.delegation = ZONES[zone]
-        args.name = args.name or zone.replace("/", "_")
+        zones = [z.lower() for value in args.zone for z in value.replace(",", " ").split()]
+        if not zones:
+            parser.error("no zone given; pass --zone or --governorate/--delegation")
+        for zone in zones:
+            if zone not in ZONES:
+                parser.error(f"unknown zone '{zone}'; see --list-zones")
+        if args.name and len(zones) > 1:
+            parser.error("--name only works with a single zone")
+        args.targets = [(*ZONES[zone], args.name or zone.replace("/", "_"))
+                        for zone in dict.fromkeys(zones)]
     else:
-        args.name = args.name or f"{args.governorate}_{args.delegation}"
+        args.targets = [(args.governorate, args.delegation,
+                         args.name or f"{args.governorate}_{args.delegation}")]
     if args.year is None:
         args.year = date.today().year
     return args
@@ -118,9 +126,9 @@ def ask_interactive(args):
     g = ask_choice("Choose a governorate", gov_names)
 
     if g == len(GOVERNORATES):
-        args.governorate = ask_int("Governorate id")
-        args.delegation = ask_int("Delegation id")
-        args.name = ask("Name for the file", f"{args.governorate}_{args.delegation}")
+        governorate = ask_int("Governorate id")
+        delegation = ask_int("Delegation id")
+        name = ask("Name for the file", f"{governorate}_{delegation}")
     else:
         gov = GOVERNORATES[g]
         delegs = gov["delegations"]
@@ -128,10 +136,11 @@ def ask_interactive(args):
         labels = [d["name"] + (" (main city)" if d["id"] == gov["main_delegation"] else "")
                   for d in delegs]
         d = delegs[ask_choice("Choose a delegation", labels)]
-        args.governorate, args.delegation = gov["id"], d["id"]
-        args.name = slug(gov["name"])
+        governorate, delegation = gov["id"], d["id"]
+        name = slug(gov["name"])
         if d["id"] != gov["main_delegation"]:
-            args.name += "_" + slug(d["name"])
+            name += "_" + slug(d["name"])
+    args.targets = [(governorate, delegation, name)]
 
     if args.year is None:
         args.year = ask_int("Year", date.today().year)
@@ -213,6 +222,8 @@ def scrape_full_timetable(year, gov, deleg, name, output_dir):
 
 if __name__ == "__main__":
     args = parse_args()
-    ok = scrape_full_timetable(args.year, args.governorate, args.delegation,
-                               args.name, args.output_dir)
-    sys.exit(0 if ok else 1)
+    failed = [name for gov, deleg, name in args.targets
+              if not scrape_full_timetable(args.year, gov, deleg, name, args.output_dir)]
+    if failed and len(args.targets) > 1:
+        print(f"Incomplete zones: {', '.join(failed)}")
+    sys.exit(1 if failed else 0)
