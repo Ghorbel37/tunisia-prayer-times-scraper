@@ -88,6 +88,7 @@ Options:
 | `--zone tunis` | Governorate to scrape, using its main city |
 | `--zone tunis/carthage` | A specific delegation of a governorate |
 | `--zone tunis ariana` | Several zones, separated by spaces or commas |
+| `--zone all` | The main city of every governorate |
 | `--list-zones` | Print every zone name |
 | `--governorate 342 --delegation 615` | Any meteo.tn zone by its ids (overrides `--zone`) |
 | `--name tunis` | Zone name used in the file name (one zone only) |

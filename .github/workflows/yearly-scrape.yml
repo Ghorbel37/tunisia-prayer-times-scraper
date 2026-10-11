@@ -10,7 +10,7 @@ on:
         description: "Year to scrape (empty = current year)"
         required: false
       zone:
-        description: "Zones to scrape, separated by spaces or commas, e.g. tunis or tunis/carthage, sousse"
+        description: "Zones to scrape, separated by spaces or commas, e.g. tunis or tunis/carthage, sousse, or all"
         required: false
         default: "tunis"
 

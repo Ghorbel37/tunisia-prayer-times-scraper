@@ -47,7 +47,8 @@ def parse_args():
                         help="governorate (e.g. tunis) or governorate/delegation "
                              "(e.g. tunis/carthage) to scrape; see --list-zones. "
                              "Give several zones, separated by spaces or commas, "
-                             "to scrape each of them. "
+                             "to scrape each of them, or all for the main city "
+                             "of every governorate. "
                              "Without a zone, the script asks for one in menus")
     parser.add_argument("--list-zones", action="store_true",
                         help="print every zone name and exit")
@@ -79,6 +80,8 @@ def parse_args():
         parser.error("--governorate and --delegation must be given together")
     if args.governorate is None:
         zones = [z.lower() for value in args.zone for z in value.replace(",", " ").split()]
+        if "all" in zones:
+            zones = [slug(gov["name"]) for gov in GOVERNORATES] + [z for z in zones if z != "all"]
         if not zones:
             parser.error("no zone given; pass --zone or --governorate/--delegation")
         for zone in zones:
