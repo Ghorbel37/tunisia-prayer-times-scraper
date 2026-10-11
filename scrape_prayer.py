@@ -29,6 +29,7 @@ with open(ZONES_FILE, encoding="utf-8") as f:
 
 
 def slug(text):
+    """Turn a name into a zone name, e.g. "Tunis" -> "tunis" (lowercase, no accents)."""
     text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode()
     return "-".join(text.lower().split())
 
@@ -61,6 +62,10 @@ COLUMNS = ["DATE", "FAJR", "SUNRISE", "DHUHR", "ASR", "MAGHRIB", "ISHA"]
 
 
 def parse_args():
+    """Read the command line and return the args, with args.targets set to the zones to scrape.
+
+    Without a zone, asks for one in menus (only in a terminal). Exits with an error for bad options.
+    """
     parser = argparse.ArgumentParser(
         description="Scrape a full year of prayer times from meteo.tn into a CSV file."
     )
@@ -124,12 +129,14 @@ def parse_args():
 
 
 def ask(prompt, default=None):
+    """Ask a question in the terminal; an empty answer gives the default."""
     suffix = f" [{default}]" if default is not None else ""
     answer = input(f"{prompt}{suffix}: ").strip()
     return answer or (str(default) if default is not None else "")
 
 
 def ask_int(prompt, default=None):
+    """Ask until the answer is a whole number and return it."""
     while True:
         answer = ask(prompt, default)
         if answer.isdigit():
@@ -138,6 +145,7 @@ def ask_int(prompt, default=None):
 
 
 def ask_choice(prompt, options, default=None):
+    """Show numbered options and return the index (from 0) of the one picked."""
     for i, option in enumerate(options, 1):
         print(f"  {i:2}. {option}")
     while True:
@@ -148,6 +156,7 @@ def ask_choice(prompt, options, default=None):
 
 
 def ask_interactive(args):
+    """Ask for the governorate, delegation and year, and set args.targets and args.year."""
     print("Governorates:")
     gov = GOVERNORATES[ask_choice("Choose a governorate", [gov["name"] for gov in GOVERNORATES])]
     delegs = gov["delegations"]
@@ -174,12 +183,14 @@ def year_files(year, output_dir="data"):
 
 
 def get_data(url):
+    """Fetch a meteo.tn URL (retrying failed requests) and return its "data" part, or {}."""
     resp = SESSION.get(url, timeout=10)
     resp.raise_for_status()
     return resp.json().get("data") or {}
 
 
 def fetch_day(day, gov, deleg):
+    """Return one CSV row with the five prayer times and sunrise for a day and zone."""
     date_str = day.strftime("%Y-%m-%d")
     row = {"DATE": date_str}
 
@@ -199,6 +210,11 @@ def fetch_day(day, gov, deleg):
 
 
 def scrape_full_timetable(year, gov, deleg, name, output_dir, delay=0.2):
+    """Scrape every day of a year for one zone into its CSV in output_dir/<Zone>/.
+
+    Waits about `delay` seconds between days. Days that fail keep their values from an
+    existing file. Returns True if every day is complete, False otherwise.
+    """
     start_date = date(year, 1, 1)
     end_date = date(year, 12, 31)
 
