@@ -120,7 +120,7 @@ It exits with an error if any day could not be fetched completely, so a broken y
 
 ## Yearly dataset
 
-The [Yearly prayer times](.github/workflows/yearly-scrape.yml) workflow runs every year on 1 January, scrapes that year for the main city of every governorate and commits the CSVs to `data/`, so the repository builds up a dataset over the years. It can also be started by hand from the Actions tab, with a year and one or more zones of your choice (for example `tunis, ariana`).
+The [Yearly prayer times](.github/workflows/yearly-scrape.yml) workflow runs every year on 1 January, scrapes that year for the main city of every governorate and commits the CSVs to `data/`, so the repository builds up a dataset over the years. Once every governorate has a file for the new year, it also moves the download links above to that year. It can also be started by hand from the Actions tab, with a year and one or more zones of your choice (for example `tunis, ariana`).
 
 ## Output
 
