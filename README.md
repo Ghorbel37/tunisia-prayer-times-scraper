@@ -98,7 +98,7 @@ Options:
 The script will:
 1. Connect to meteo.tn's API
 2. Fetch prayer times for each day of the year
-3. Save results to `data/<zone>/prayer_times_tunisia_<zone>_<year>.csv`, so all the years of a zone sit in the same folder
+3. Save results to `data/<Zone>/prayer_times_tunisia_<zone>_<year>.csv`, so all the years of a zone sit in the same folder
 4. Display progress in the console
 
 It exits with an error if any day could not be fetched completely, so a broken year is never mistaken for a good one.
