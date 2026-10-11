@@ -165,6 +165,14 @@ def ask_interactive(args):
         args.year = ask_int("Year", date.today().year)
 
 
+def year_files(year, output_dir="data"):
+    """The CSV of every governorate's main city for a year, or None if any is missing."""
+    files = [os.path.join(output_dir, slug(gov["name"]).title(),
+                          f"prayer_times_tunisia_{slug(gov['name'])}_{year}.csv")
+             for gov in GOVERNORATES]
+    return files if all(os.path.exists(f) for f in files) else None
+
+
 def get_data(url):
     resp = SESSION.get(url, timeout=10)
     resp.raise_for_status()

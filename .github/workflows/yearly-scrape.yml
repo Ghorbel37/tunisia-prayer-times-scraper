@@ -69,3 +69,22 @@ jobs:
             git pull --rebase
             git push
           fi
+
+      - name: Publish the year as a release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Only once every governorate has a file for this year; a re-run replaces the files
+          FILES=$(python -c 'import sys, scrape_prayer; print(" ".join(scrape_prayer.year_files(sys.argv[1]) or []))' "$YEAR")
+          if [ -z "$FILES" ]; then
+            echo "Not every governorate has a $YEAR file yet, so no release."
+            exit 0
+          fi
+          ZIP="prayer_times_tunisia_$YEAR.zip"
+          zip -j "$ZIP" $FILES
+          if gh release view "$YEAR" > /dev/null 2>&1; then
+            gh release upload "$YEAR" "$ZIP" $FILES --clobber
+          else
+            gh release create "$YEAR" "$ZIP" $FILES --target main --title "Prayer times $YEAR" \
+              --notes "Prayer times for $YEAR for the main city of all 24 Tunisian governorates, scraped from meteo.tn. The zip holds all 24 files; each CSV has the columns DATE, FAJR, SUNRISE, DHUHR, ASR, MAGHRIB, ISHA."
+          fi

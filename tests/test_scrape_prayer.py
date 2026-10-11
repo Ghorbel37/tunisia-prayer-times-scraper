@@ -193,6 +193,28 @@ class ScrapeTest(unittest.TestCase):
         self.assertEqual(os.listdir(os.path.join(self.out, "Tunis_Carthage")), [])
 
 
+class YearFilesTest(unittest.TestCase):
+    def setUp(self):
+        self.out = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.out)
+
+    def add(self, names, year=2027):
+        for name in names:
+            folder = os.path.join(self.out, name.title())
+            os.makedirs(folder, exist_ok=True)
+            open(os.path.join(folder, f"prayer_times_tunisia_{name}_{year}.csv"), "w").close()
+
+    def test_every_governorate(self):
+        self.add([z for z in scrape_prayer.ZONES if "/" not in z])
+        files = scrape_prayer.year_files(2027, self.out)
+        self.assertEqual(len(files), 24)
+        self.assertIn(os.path.join(self.out, "Le-Kef", "prayer_times_tunisia_le-kef_2027.csv"), files)
+
+    def test_none_if_one_is_missing(self):
+        self.add([z for z in scrape_prayer.ZONES if "/" not in z and z != "tunis"])
+        self.assertIsNone(scrape_prayer.year_files(2027, self.out))
+
+
 class FetchDayTest(unittest.TestCase):
     def test_maps_the_meteo_tn_fields(self):
         answers = {
