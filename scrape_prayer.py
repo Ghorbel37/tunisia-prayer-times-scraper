@@ -67,7 +67,8 @@ def parse_args():
                              "randomly between half and one and a half times this "
                              "(default: 0.2)")
     parser.add_argument("--output-dir", default="data",
-                        help="folder the CSV is written to (default: data)")
+                        help="folder the CSVs are written to, in one subfolder per zone "
+                             "(default: data)")
     args = parser.parse_args()
 
     if args.list_zones:
@@ -184,8 +185,10 @@ def scrape_full_timetable(year, gov, deleg, name, output_dir, delay=0.2):
     start_date = date(year, 1, 1)
     end_date = date(year, 12, 31)
 
-    os.makedirs(output_dir, exist_ok=True)
-    filename = os.path.join(output_dir, f"prayer_times_{name}_{year}.csv")
+    # One folder per zone, so every year of a zone sits together
+    zone_dir = os.path.join(output_dir, name)
+    os.makedirs(zone_dir, exist_ok=True)
+    filename = os.path.join(zone_dir, f"prayer_times_{name}_{year}.csv")
 
     print(f"Starting scrape for {name} {year} ({gov}/{deleg})... output file: {filename}")
 

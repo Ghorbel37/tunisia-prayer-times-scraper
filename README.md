@@ -93,12 +93,12 @@ Options:
 | `--governorate 342 --delegation 615` | Any meteo.tn zone by its ids (overrides `--zone`) |
 | `--name tunis` | Zone name used in the file name (one zone only) |
 | `--delay 1` | Average seconds between days, varied randomly by ±50% (default: `0.2`) |
-| `--output-dir data` | Folder the CSV is written to (default: `data`) |
+| `--output-dir data` | Folder the CSVs are written to, in one subfolder per zone (default: `data`) |
 
 The script will:
 1. Connect to meteo.tn's API
 2. Fetch prayer times for each day of the year
-3. Save results to `data/prayer_times_<zone>_<year>.csv`
+3. Save results to `data/<zone>/prayer_times_<zone>_<year>.csv`, so all the years of a zone sit in the same folder
 4. Display progress in the console
 
 It exits with an error if any day could not be fetched completely, so a broken year is never mistaken for a good one.
