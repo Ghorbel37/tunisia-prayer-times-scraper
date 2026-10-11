@@ -34,50 +34,50 @@ This script fetches daily prayer times and sunrise information for a full year f
 
 ## Usage
 
-Create a virtual environment and install the dependency, once.
+Create a virtual environment:
 
-Windows (PowerShell):
-
-```powershell
+```bash
 python -m venv .venv
-.venv\Scripts\python -m pip install -r requirements.txt
 ```
 
-Linux and macOS:
+Activate the virtual environment:
 
 ```bash
-python3 -m venv .venv
-.venv/bin/python -m pip install -r requirements.txt
+# Windows (PowerShell)
+.venv\Scripts\Activate.ps1
+
+# Linux and macOS
+source .venv/bin/activate
 ```
 
-Run the script with the virtual environment's Python:
-
-```powershell
-.venv\Scripts\python scrape_prayer.py
-```
+Install the dependency:
 
 ```bash
-.venv/bin/python scrape_prayer.py
+pip install -r requirements.txt
 ```
 
-It asks you to pick a governorate, then a delegation, then the year (press Enter for the current year). To skip the questions, give the zone on the command line:
+### Interactive mode
 
-```powershell
-.venv\Scripts\python scrape_prayer.py --zone tunis --year 2027
-```
+Run the script without options:
 
 ```bash
-.venv/bin/python scrape_prayer.py --zone tunis --year 2027
+python scrape_prayer.py
+```
+
+It asks you to pick a governorate, then a delegation, then the year (press Enter for the current year).
+
+### Command line
+
+Alternatively, you can directly specify the zone and year:
+
+```bash
+python scrape_prayer.py --zone tunis --year 2027
 ```
 
 To scrape several zones in one run, list them after `--zone`. Each zone gets its own CSV:
 
-```powershell
-.venv\Scripts\python scrape_prayer.py --zone tunis tunis/carthage ariana
-```
-
 ```bash
-.venv/bin/python scrape_prayer.py --zone tunis tunis/carthage ariana
+python scrape_prayer.py --zone tunis tunis/carthage ariana
 ```
 
 Options:
