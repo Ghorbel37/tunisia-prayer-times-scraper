@@ -34,7 +34,18 @@ This script fetches daily prayer times and sunrise information for a full year f
 
 ## Ready-made data
 
-The [`data/`](data) folder already holds CSVs scraped by the [yearly workflow](#yearly-dataset), one folder per zone. If the zone and year you need are there, you can use them directly without running the script.
+Prayer times for 2026, one file per governorate (its main city):
+
+| | | | |
+|---|---|---|---|
+| [Ariana](data/Ariana/prayer_times_tunisia_ariana_2026.csv) | [Béja](data/Beja/prayer_times_tunisia_beja_2026.csv) | [Ben Arous](data/Ben-Arous/prayer_times_tunisia_ben-arous_2026.csv) | [Bizerte](data/Bizerte/prayer_times_tunisia_bizerte_2026.csv) |
+| [Gabès](data/Gabes/prayer_times_tunisia_gabes_2026.csv) | [Gafsa](data/Gafsa/prayer_times_tunisia_gafsa_2026.csv) | [Jendouba](data/Jendouba/prayer_times_tunisia_jendouba_2026.csv) | [Kairouan](data/Kairouan/prayer_times_tunisia_kairouan_2026.csv) |
+| [Kasserine](data/Kasserine/prayer_times_tunisia_kasserine_2026.csv) | [Kébili](data/Kebili/prayer_times_tunisia_kebili_2026.csv) | [Le Kef](data/Le-Kef/prayer_times_tunisia_le-kef_2026.csv) | [Mahdia](data/Mahdia/prayer_times_tunisia_mahdia_2026.csv) |
+| [Manouba](data/Manouba/prayer_times_tunisia_manouba_2026.csv) | [Médenine](data/Medenine/prayer_times_tunisia_medenine_2026.csv) | [Monastir](data/Monastir/prayer_times_tunisia_monastir_2026.csv) | [Nabeul](data/Nabeul/prayer_times_tunisia_nabeul_2026.csv) |
+| [Sfax](data/Sfax/prayer_times_tunisia_sfax_2026.csv) | [Sidi Bouzid](data/Sidi-Bouzid/prayer_times_tunisia_sidi-bouzid_2026.csv) | [Siliana](data/Siliana/prayer_times_tunisia_siliana_2026.csv) | [Sousse](data/Sousse/prayer_times_tunisia_sousse_2026.csv) |
+| [Tataouine](data/Tataouine/prayer_times_tunisia_tataouine_2026.csv) | [Tozeur](data/Tozeur/prayer_times_tunisia_tozeur_2026.csv) | [Tunis](data/Tunis/prayer_times_tunisia_tunis_2026.csv) | [Zaghouan](data/Zaghouan/prayer_times_tunisia_zaghouan_2026.csv) |
+
+The [`data/`](data) folder has more files if you need them, with every year scraped so far in one folder per zone. If your region isn't there, you can easily scrape it yourself, see [Usage](#usage).
 
 ## Usage
 
