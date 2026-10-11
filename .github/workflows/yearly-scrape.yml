@@ -9,6 +9,10 @@ on:
       year:
         description: "Year to scrape (empty = current year)"
         required: false
+      delay:
+        description: "Seconds to wait between requests"
+        required: false
+        default: "1"
       zone:
         description: "Zones to scrape, separated by spaces or commas, e.g. tunis or tunis/carthage, sousse, or all"
         required: false
@@ -34,12 +38,14 @@ jobs:
         env:
           YEAR: ${{ inputs.year }}
           ZONE: ${{ inputs.zone }}
+          DELAY: ${{ inputs.delay }}
         run: |
           echo "YEAR=${YEAR:-$(date -u +%Y)}" >> "$GITHUB_ENV"
           echo "ZONE=${ZONE:-tunis}" >> "$GITHUB_ENV"
+          echo "DELAY=${DELAY:-1}" >> "$GITHUB_ENV"
 
       - name: Scrape the year
-        run: python scrape_prayer.py --zone "$ZONE" --year "$YEAR"
+        run: python scrape_prayer.py --zone "$ZONE" --year "$YEAR" --delay "$DELAY"
 
       - name: Commit the CSVs
         if: ${{ !cancelled() }}

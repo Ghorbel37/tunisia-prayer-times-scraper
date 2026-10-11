@@ -58,6 +58,8 @@ def parse_args():
                         help="meteo.tn delegation id (overrides --zone)")
     parser.add_argument("--name",
                         help="zone name used in the output file name (default: the zone name)")
+    parser.add_argument("--delay", type=float, default=0.2,
+                        help="seconds to wait between days (default: 0.2)")
     parser.add_argument("--output-dir", default="data",
                         help="folder the CSV is written to (default: data)")
     args = parser.parse_args()
@@ -172,7 +174,7 @@ def fetch_day(day, gov, deleg):
     return row
 
 
-def scrape_full_timetable(year, gov, deleg, name, output_dir):
+def scrape_full_timetable(year, gov, deleg, name, output_dir, delay=0.2):
     start_date = date(year, 1, 1)
     end_date = date(year, 12, 31)
 
@@ -204,7 +206,7 @@ def scrape_full_timetable(year, gov, deleg, name, output_dir):
             return False
 
         # Sleep briefly to be respectful to the server
-        time.sleep(0.2)
+        time.sleep(delay)
         current_date += timedelta(days=1)
 
     if len(missing) == len(rows):
@@ -226,7 +228,8 @@ def scrape_full_timetable(year, gov, deleg, name, output_dir):
 if __name__ == "__main__":
     args = parse_args()
     failed = [name for gov, deleg, name in args.targets
-              if not scrape_full_timetable(args.year, gov, deleg, name, args.output_dir)]
+              if not scrape_full_timetable(args.year, gov, deleg, name, args.output_dir,
+                                           args.delay)]
     if failed and len(args.targets) > 1:
         print(f"Incomplete zones: {', '.join(failed)}")
     sys.exit(1 if failed else 0)
