@@ -16,7 +16,7 @@ on:
       zone:
         description: "Zones to scrape, separated by spaces or commas, e.g. tunis or tunis/carthage, sousse, or all"
         required: false
-        default: "tunis"
+        default: "all"
 
 permissions:
   contents: write
@@ -41,7 +41,7 @@ jobs:
           DELAY: ${{ inputs.delay }}
         run: |
           echo "YEAR=${YEAR:-$(date -u +%Y)}" >> "$GITHUB_ENV"
-          echo "ZONE=${ZONE:-tunis}" >> "$GITHUB_ENV"
+          echo "ZONE=${ZONE:-all}" >> "$GITHUB_ENV"
           echo "DELAY=${DELAY:-1}" >> "$GITHUB_ENV"
 
       - name: Scrape the year
