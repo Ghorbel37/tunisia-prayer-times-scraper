@@ -32,6 +32,10 @@ This script fetches daily prayer times and sunrise information for a full year f
 - **Respectful Scraping**: A configurable, slightly random delay between requests to avoid server strain
 - **CSV Export**: Easy-to-read CSV format for import into other applications
 
+## Ready-made data
+
+The [`data/`](data) folder already holds CSVs scraped by the [yearly workflow](#yearly-dataset), one folder per zone. If the zone and year you need are there, you can use them directly without running the script.
+
 ## Usage
 
 Create a virtual environment:
