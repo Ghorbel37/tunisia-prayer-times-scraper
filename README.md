@@ -29,7 +29,7 @@ This script fetches daily prayer times and sunrise information for a full year f
   - Maghrib (sunset)
   - Isha (night)
 - **Sunrise Times**: Includes sunrise times
-- **Respectful Scraping**: A configurable delay between requests to avoid server strain
+- **Respectful Scraping**: A configurable, slightly random delay between requests to avoid server strain
 - **CSV Export**: Easy-to-read CSV format for import into other applications
 
 ## Usage
@@ -92,7 +92,7 @@ Options:
 | `--list-zones` | Print every zone name |
 | `--governorate 342 --delegation 615` | Any meteo.tn zone by its ids (overrides `--zone`) |
 | `--name tunis` | Zone name used in the file name (one zone only) |
-| `--delay 1` | Seconds to wait between days (default: `0.2`) |
+| `--delay 1` | Average seconds between days, varied randomly by ±50% (default: `0.2`) |
 | `--output-dir data` | Folder the CSV is written to (default: `data`) |
 
 The script will:

@@ -10,7 +10,7 @@ on:
         description: "Year to scrape (empty = current year)"
         required: false
       delay:
-        description: "Seconds to wait between requests"
+        description: "Average seconds between requests (each wait varies randomly around it)"
         required: false
         default: "1"
       zone:

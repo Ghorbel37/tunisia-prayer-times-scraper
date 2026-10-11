@@ -2,6 +2,7 @@ import argparse
 import csv
 import json
 import os
+import random
 import sys
 import time
 import unicodedata
@@ -59,7 +60,9 @@ def parse_args():
     parser.add_argument("--name",
                         help="zone name used in the output file name (default: the zone name)")
     parser.add_argument("--delay", type=float, default=0.2,
-                        help="seconds to wait between days (default: 0.2)")
+                        help="average seconds to wait between days; each wait varies "
+                             "randomly between half and one and a half times this "
+                             "(default: 0.2)")
     parser.add_argument("--output-dir", default="data",
                         help="folder the CSV is written to (default: data)")
     args = parser.parse_args()
@@ -206,7 +209,7 @@ def scrape_full_timetable(year, gov, deleg, name, output_dir, delay=0.2):
             return False
 
         # Sleep briefly to be respectful to the server
-        time.sleep(delay)
+        time.sleep(random.uniform(delay * 0.5, delay * 1.5))
         current_date += timedelta(days=1)
 
     if len(missing) == len(rows):
