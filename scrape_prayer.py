@@ -14,6 +14,9 @@ import requests
 PRAYER_URL = "https://www.meteo.tn/horaire_gouvernorat/{date}/{gov}/{deleg}"
 SUNRISE_URL = "https://www.meteo.tn/lever_coucher_gouvernorat/{date}/{gov}/{deleg}"
 
+# One connection reused for every request, instead of a new one each time
+SESSION = requests.Session()
+
 # Every governorate and delegation listed on https://www.meteo.tn/fr/heures-prieres
 ZONES_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "zones.json")
 with open(ZONES_FILE, encoding="utf-8") as f:
@@ -159,7 +162,7 @@ def fetch_day(day, gov, deleg):
     row = {"DATE": date_str}
 
     # Get Prayer Times
-    p_resp = requests.get(PRAYER_URL.format(date=date_str, gov=gov, deleg=deleg), timeout=10)
+    p_resp = SESSION.get(PRAYER_URL.format(date=date_str, gov=gov, deleg=deleg), timeout=10)
     p_resp.raise_for_status()
     p_data = p_resp.json().get("data") or {}
     row["FAJR"] = p_data.get("sobh", "")
@@ -169,7 +172,7 @@ def fetch_day(day, gov, deleg):
     row["ISHA"] = p_data.get("isha", "")
 
     # Get Sunrise
-    s_resp = requests.get(SUNRISE_URL.format(date=date_str, gov=gov, deleg=deleg), timeout=10)
+    s_resp = SESSION.get(SUNRISE_URL.format(date=date_str, gov=gov, deleg=deleg), timeout=10)
     s_resp.raise_for_status()
     s_data = s_resp.json().get("data") or {}
     row["SUNRISE"] = s_data.get("lever", "")
