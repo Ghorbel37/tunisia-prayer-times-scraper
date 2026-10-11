@@ -35,13 +35,27 @@ def slug(text):
 
 # Known zones: name -> (governorate id, delegation id) on meteo.tn.
 # A governorate name ("tunis") means its main city; "tunis/carthage" picks a delegation.
+# ZONE_TITLES keeps the real names for display ("tunis/carthage" -> "Tunis/Carthage").
 ZONES = {}
+ZONE_TITLES = {}
 for gov in GOVERNORATES:
     ZONES[slug(gov["name"])] = (gov["id"], gov["main_delegation"])
+    ZONE_TITLES[slug(gov["name"])] = gov["name"]
     for deleg in gov["delegations"]:
         if deleg["id"] == gov["main_delegation"]:
             continue
         ZONES[f"{slug(gov['name'])}/{slug(deleg['name'])}"] = (gov["id"], deleg["id"])
+        ZONE_TITLES[f"{slug(gov['name'])}/{slug(deleg['name'])}"] = f"{gov['name']}/{deleg['name']}"
+
+
+def describe_zones(text):
+    """Turn a zone list like "tunis, tunis/carthage" into "Tunis, Tunis/Carthage" for commit messages."""
+    zones = list(dict.fromkeys(text.lower().replace(",", " ").split()))
+    names = [ZONE_TITLES.get(z, z) for z in zones]
+    if "all" in zones:
+        # "all" already covers every governorate; only extra delegations are worth naming
+        names = ["all governorates"] + [ZONE_TITLES.get(z, z) for z in zones if "/" in z]
+    return ", ".join(names)
 
 COLUMNS = ["DATE", "FAJR", "SUNRISE", "DHUHR", "ASR", "MAGHRIB", "ISHA"]
 

@@ -56,6 +56,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else
-            git commit -m "Add prayer times for $(echo "$ZONE" | tr ',' ' ' | xargs | sed 's/ /, /g') $YEAR"
+            ZONES=$(python -c 'import sys, scrape_prayer; print(scrape_prayer.describe_zones(sys.argv[1]))' "$ZONE")
+            git commit -m "Add prayer times for $ZONES $YEAR"
             git push
           fi
