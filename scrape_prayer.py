@@ -152,25 +152,17 @@ def ask_choice(prompt, options, default=None):
 
 
 def ask_interactive(args):
-    gov_names = [gov["name"] for gov in GOVERNORATES] + ["Other (enter meteo.tn ids)"]
     print("Governorates:")
-    g = ask_choice("Choose a governorate", gov_names)
-
-    if g == len(GOVERNORATES):
-        governorate = ask_int("Governorate id")
-        delegation = ask_int("Delegation id")
-        name = ask("Name for the file", f"{governorate}_{delegation}")
-    else:
-        gov = GOVERNORATES[g]
-        delegs = gov["delegations"]
-        print(f"Delegations of {gov['name']}:")
-        labels = [d["name"] + (" (main city)" if d["id"] == gov["main_delegation"] else "")
-                  for d in delegs]
-        d = delegs[ask_choice("Choose a delegation", labels)]
-        governorate, delegation = gov["id"], d["id"]
-        name = slug(gov["name"])
-        if d["id"] != gov["main_delegation"]:
-            name += "_" + slug(d["name"])
+    gov = GOVERNORATES[ask_choice("Choose a governorate", [gov["name"] for gov in GOVERNORATES])]
+    delegs = gov["delegations"]
+    print(f"Delegations of {gov['name']}:")
+    labels = [d["name"] + (" (main city)" if d["id"] == gov["main_delegation"] else "")
+              for d in delegs]
+    d = delegs[ask_choice("Choose a delegation", labels)]
+    governorate, delegation = gov["id"], d["id"]
+    name = slug(gov["name"])
+    if d["id"] != gov["main_delegation"]:
+        name += "_" + slug(d["name"])
     args.targets = [(governorate, delegation, name)]
 
     if args.year is None:
