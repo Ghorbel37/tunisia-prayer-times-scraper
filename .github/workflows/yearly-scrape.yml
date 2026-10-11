@@ -58,5 +58,6 @@ jobs:
           else
             ZONES=$(python -c 'import sys, scrape_prayer; print(scrape_prayer.describe_zones(sys.argv[1]))' "$ZONE")
             git commit -m "Add prayer times for $ZONES $YEAR"
+            git pull --rebase
             git push
           fi
