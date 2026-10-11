@@ -97,11 +97,7 @@ def parse_args():
     if args.zone is None and args.governorate is None and args.delegation is None:
         if not sys.stdin.isatty():
             parser.error("no zone given; pass --zone or --governorate/--delegation")
-        try:
-            ask_interactive(args)
-        except (EOFError, KeyboardInterrupt):
-            print("\nCancelled.")
-            sys.exit(1)
+        ask_interactive(args)
         return args
 
     if (args.governorate is None) != (args.delegation is None):
@@ -250,10 +246,15 @@ def scrape_full_timetable(year, gov, deleg, name, output_dir, delay=0.2):
 if __name__ == "__main__":
     # Show the "Retrying ..." lines that requests logs when a request fails
     logging.basicConfig(format="  %(message)s")
-    args = parse_args()
-    failed = [name for gov, deleg, name in args.targets
-              if not scrape_full_timetable(args.year, gov, deleg, name, args.output_dir,
-                                           args.delay)]
+    try:
+        args = parse_args()
+        failed = [name for gov, deleg, name in args.targets
+                  if not scrape_full_timetable(args.year, gov, deleg, name, args.output_dir,
+                                               args.delay)]
+    except (KeyboardInterrupt, EOFError):
+        # Ctrl+C (or closing the input in the menus) stops quietly instead of printing a traceback
+        print("\nCancelled.")
+        sys.exit(1)
     if failed and len(args.targets) > 1:
         print(f"Incomplete zones: {', '.join(failed)}")
     sys.exit(1 if failed else 0)
