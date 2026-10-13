@@ -47,10 +47,10 @@ jobs:
       - name: Scrape the year
         run: python scrape_prayer.py --zone "$ZONE" --year "$YEAR" --delay "$DELAY"
 
-      - name: Move the README links to the new year
+      - name: Update data/_latest and the README year
         if: ${{ !cancelled() }}
         run: |
-          # Only for the current year; the script leaves the README alone if any linked file is missing
+          # Only for the current year; nothing changes if any governorate is missing a file
           if [ "$YEAR" = "$(date -u +%Y)" ]; then
             python .github/scripts/update_readme.py "$YEAR"
           fi
