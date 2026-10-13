@@ -1,12 +1,12 @@
 """Point the README's download links at a new year, once that year's files exist.
 
-Used by the yearly workflow: python update_readme.py 2027
+Used by the yearly workflow: python .github/scripts/update_readme.py 2027
 """
 import os
 import re
 import sys
 
-ROOT = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SECTION = "## Ready-made data"
 LINK = re.compile(r"\((data/[^)\s]+?)_(\d{4})\.csv\)")
 HEADING = re.compile(r"Prayer times for \d{4}")

@@ -52,7 +52,7 @@ jobs:
         run: |
           # Only for the current year; the script leaves the README alone if any linked file is missing
           if [ "$YEAR" = "$(date -u +%Y)" ]; then
-            python update_readme.py "$YEAR"
+            python .github/scripts/update_readme.py "$YEAR"
           fi
 
       - name: Commit the CSVs

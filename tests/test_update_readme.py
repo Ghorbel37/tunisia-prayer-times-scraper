@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from contextlib import redirect_stdout
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".github", "scripts"))
 import update_readme  # noqa: E402
 
 REAL_README = os.path.join(update_readme.ROOT, "README.md")
