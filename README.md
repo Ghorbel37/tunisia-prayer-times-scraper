@@ -38,14 +38,14 @@ Prayer times for 2026, one file per governorate (its main city):
 
 | | | | |
 |---|---|---|---|
-| [Ariana](data/Ariana/prayer_times_tunisia_ariana_2026.csv) | [Béja](data/Beja/prayer_times_tunisia_beja_2026.csv) | [Ben Arous](data/Ben-Arous/prayer_times_tunisia_ben-arous_2026.csv) | [Bizerte](data/Bizerte/prayer_times_tunisia_bizerte_2026.csv) |
-| [Gabès](data/Gabes/prayer_times_tunisia_gabes_2026.csv) | [Gafsa](data/Gafsa/prayer_times_tunisia_gafsa_2026.csv) | [Jendouba](data/Jendouba/prayer_times_tunisia_jendouba_2026.csv) | [Kairouan](data/Kairouan/prayer_times_tunisia_kairouan_2026.csv) |
-| [Kasserine](data/Kasserine/prayer_times_tunisia_kasserine_2026.csv) | [Kébili](data/Kebili/prayer_times_tunisia_kebili_2026.csv) | [Le Kef](data/Le-Kef/prayer_times_tunisia_le-kef_2026.csv) | [Mahdia](data/Mahdia/prayer_times_tunisia_mahdia_2026.csv) |
-| [Manouba](data/Manouba/prayer_times_tunisia_manouba_2026.csv) | [Médenine](data/Medenine/prayer_times_tunisia_medenine_2026.csv) | [Monastir](data/Monastir/prayer_times_tunisia_monastir_2026.csv) | [Nabeul](data/Nabeul/prayer_times_tunisia_nabeul_2026.csv) |
-| [Sfax](data/Sfax/prayer_times_tunisia_sfax_2026.csv) | [Sidi Bouzid](data/Sidi-Bouzid/prayer_times_tunisia_sidi-bouzid_2026.csv) | [Siliana](data/Siliana/prayer_times_tunisia_siliana_2026.csv) | [Sousse](data/Sousse/prayer_times_tunisia_sousse_2026.csv) |
-| [Tataouine](data/Tataouine/prayer_times_tunisia_tataouine_2026.csv) | [Tozeur](data/Tozeur/prayer_times_tunisia_tozeur_2026.csv) | [Tunis](data/Tunis/prayer_times_tunisia_tunis_2026.csv) | [Zaghouan](data/Zaghouan/prayer_times_tunisia_zaghouan_2026.csv) |
+| [Ariana](data/_latest/prayer_times_tunisia_ariana.csv) | [Béja](data/_latest/prayer_times_tunisia_beja.csv) | [Ben Arous](data/_latest/prayer_times_tunisia_ben-arous.csv) | [Bizerte](data/_latest/prayer_times_tunisia_bizerte.csv) |
+| [Gabès](data/_latest/prayer_times_tunisia_gabes.csv) | [Gafsa](data/_latest/prayer_times_tunisia_gafsa.csv) | [Jendouba](data/_latest/prayer_times_tunisia_jendouba.csv) | [Kairouan](data/_latest/prayer_times_tunisia_kairouan.csv) |
+| [Kasserine](data/_latest/prayer_times_tunisia_kasserine.csv) | [Kébili](data/_latest/prayer_times_tunisia_kebili.csv) | [Le Kef](data/_latest/prayer_times_tunisia_le-kef.csv) | [Mahdia](data/_latest/prayer_times_tunisia_mahdia.csv) |
+| [Manouba](data/_latest/prayer_times_tunisia_manouba.csv) | [Médenine](data/_latest/prayer_times_tunisia_medenine.csv) | [Monastir](data/_latest/prayer_times_tunisia_monastir.csv) | [Nabeul](data/_latest/prayer_times_tunisia_nabeul.csv) |
+| [Sfax](data/_latest/prayer_times_tunisia_sfax.csv) | [Sidi Bouzid](data/_latest/prayer_times_tunisia_sidi-bouzid.csv) | [Siliana](data/_latest/prayer_times_tunisia_siliana.csv) | [Sousse](data/_latest/prayer_times_tunisia_sousse.csv) |
+| [Tataouine](data/_latest/prayer_times_tunisia_tataouine.csv) | [Tozeur](data/_latest/prayer_times_tunisia_tozeur.csv) | [Tunis](data/_latest/prayer_times_tunisia_tunis.csv) | [Zaghouan](data/_latest/prayer_times_tunisia_zaghouan.csv) |
 
-The [`data/`](data) folder has more files if you need them, with every year scraped so far in one folder per zone. If your region isn't there, you can easily scrape it yourself, see [Usage](#usage).
+The [`data/`](data) folder has more files if you need them, with every year scraped so far in one folder per zone, and `data/_latest` with a copy of the newest year. If your region isn't there, you can easily scrape it yourself, see [Usage](#usage).
 
 ## Usage
 
@@ -120,7 +120,7 @@ It exits with an error if any day could not be fetched completely, so a broken y
 
 ## Yearly dataset
 
-The [Yearly prayer times](.github/workflows/yearly-scrape.yml) workflow runs every year on 1 January, scrapes that year for the main city of every governorate and commits the CSVs to `data/`, so the repository builds up a dataset over the years. Once every governorate has a file for the new year, it also moves the download links above to that year. It can also be started by hand from the Actions tab, with a year and one or more zones of your choice (for example `tunis, ariana`).
+The [Yearly prayer times](.github/workflows/yearly-scrape.yml) workflow runs every year on 1 January, scrapes that year for the main city of every governorate and commits the CSVs to `data/`, so the repository builds up a dataset over the years. Once every governorate has a file for the new year, it copies them to `data/_latest` (where the links above point) and updates the year shown above. It can also be started by hand from the Actions tab, with a year and one or more zones of your choice (for example `tunis, ariana`).
 
 ## Output
 

@@ -1,5 +1,6 @@
 import io
 import os
+import re
 import shutil
 import sys
 import tempfile
@@ -59,6 +60,14 @@ class UpdateReadmeTest(unittest.TestCase):
         self.assertFalse(self.update(2027))
         self.assertEqual(self.readme(), before)
         self.assertFalse(os.path.exists(os.path.join(self.root, update_readme.LATEST_DIR)))
+
+    def test_readme_links_point_to_the_latest_files(self):
+        links = re.findall(r"\((data/_latest/[^)\s]+\.csv)\)", self.readme())
+        self.assertEqual(sorted(links), sorted(f"data/_latest/prayer_times_tunisia_{zone}.csv"
+                                               for zone in ZONES))
+        missing = [link for link in links
+                   if not os.path.exists(os.path.join(update_readme.ROOT, link))]
+        self.assertEqual(missing, [])
 
 
 if __name__ == "__main__":
