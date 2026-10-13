@@ -10,7 +10,14 @@ A Python script that scrapes Islamic prayer times from Tunisia's official meteor
 
 ## Why this exists
 
-This dataset was made for the [Prayer Times](https://play.google.com/store/apps/details?id=com.reworewo.prayertimes) Android app (`com.reworewo.prayertimes`), because the prayer times set in that app were incorrect for Tunisia. The data itself comes from meteo.tn, not from the app.
+Tunisia's official authority for prayer times, meteo.tn, does not publish a full-year timetable online. This project builds that yearly list from the official data, one CSV per governorate, so it can be loaded into prayer apps instead of times they calculate themselves.
+
+## Compatible apps
+
+These apps can load the CSVs as they are (both were tested with this data):
+
+- [Prayer Times](https://play.google.com/store/apps/details?id=com.reworewo.prayertimes) (Android, `com.reworewo.prayertimes`): import the timetable CSV of your governorate.
+- [Prayer Times – Islamic Tools](https://play.google.com/store/apps/details?id=com.metinkale.prayer) (Android, `com.metinkale.prayer`): add a city, choose "CSV", then pick the file or paste its link. Use the raw link of a file in `data/_latest` so the app keeps getting the newest year.
 
 ## Overview
 
